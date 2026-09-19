@@ -1,0 +1,11 @@
+{
+  "name": "quizarena-functions",
+  "description": "Secure scoring for QuizArena",
+  "main": "index.js",
+  "engines": { "node": "20" },
+  "dependencies": {
+    "firebase-admin": "^12.1.0",
+    "firebase-functions": "^5.0.1"
+  },
+  "private": true
+}

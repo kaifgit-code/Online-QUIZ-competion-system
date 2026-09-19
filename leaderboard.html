@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leaderboard — QuizArena</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Quiz<span>Arena</span></div>
+  <a href="index.html">Home</a>
+</header>
+
+<main class="wrap">
+
+  <section class="card">
+    <h1 id="lbTitle">Leaderboard</h1>
+    <p class="muted" id="lbSub">Ranked by score, then by how fast the quiz was finished.</p>
+    <div class="row" id="pickWrap">
+      <input id="quizInput" placeholder="Quiz code" style="max-width:240px">
+      <button id="loadBtn">Show board</button>
+    </div>
+  </section>
+
+  <section id="winnerCard" class="card hidden">
+    <span class="pill" style="background:#fff3cd;border-color:#f0dcae;color:var(--gold)">Declared winner</span>
+    <h2 id="winnerName" style="margin-top:10px">—</h2>
+    <p class="muted" id="winnerLine"></p>
+  </section>
+
+  <section class="card">
+    <div id="lbState" class="muted">Enter a quiz code above to load a board.</div>
+    <div class="tablewrap">
+      <table id="lbTable" class="hidden">
+        <thead>
+          <tr><th>#</th><th>Participant</th><th>Score</th><th>Time</th></tr>
+        </thead>
+        <tbody id="lbBody"></tbody>
+      </table>
+    </div>
+    <p class="hint">Only rank, name, score and time are public. Roll numbers and emails are never shown here.</p>
+  </section>
+
+</main>
+
+<script type="module" src="js/leaderboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,129 @@
+rules_version = '2';
+
+// =====================================================================
+//  QuizArena — Firestore security rules
+//
+//  Golden rule: the browser can WRITE its own answers and READ its own
+//  result. It can never read the answer key and can never write a score.
+//  Scores exist only because the Cloud Function (Admin SDK) writes them,
+//  and the Admin SDK bypasses these rules entirely.
+// =====================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // An account is an admin only if a doc with its UID exists in /admins.
+    function isAdmin() {
+      return signedIn() &&
+             exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Participant doc ids look like  "<quizId>__<uid>".
+    function ownsId(docId) {
+      return signedIn() && docId.matches('.*__' + request.auth.uid);
+    }
+
+    // ---------------------------------------------------------------
+    // admins/{uid}  — the allow-list itself
+    // Created by hand in the Firebase console. Nobody can write it from
+    // the app, so an admin can never be added from the browser.
+    // ---------------------------------------------------------------
+    match /admins/{uid} {
+      allow get: if signedIn() && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    // ---------------------------------------------------------------
+    // quizzes/{quizId} — public metadata (title, duration, status, winner)
+    // Nothing secret is stored on this document.
+    // ---------------------------------------------------------------
+    match /quizzes/{quizId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+
+      // Questions WITHOUT the correct answer. Safe to read publicly.
+      match /questions/{questionId} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+
+      // The correct answers. Admins only — the Cloud Function reads this
+      // with the Admin SDK, which is not subject to these rules.
+      match /answerKey/{questionId} {
+        allow read, write: if isAdmin();
+      }
+
+      // Autosaved answers so a refresh or a dropped signal doesn't lose work.
+      // A participant can only touch their own draft, and can never read
+      // anyone else's.
+      match /drafts/{uid} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+        allow read: if isAdmin();
+      }
+    }
+
+    // ---------------------------------------------------------------
+    // participants/{quizId__uid} — who joined
+    // Created once by the participant. After that it is read-only to them;
+    // only the Cloud Function flips `submitted`.
+    // ---------------------------------------------------------------
+    match /participants/{pid} {
+      allow get: if ownsId(pid) || isAdmin();
+      allow list: if isAdmin();
+
+      allow create: if signedIn()
+        && pid == request.resource.data.quizId + '__' + request.auth.uid
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.keys().hasOnly(
+             ['quizId','uid','name','email','roll','joinedAt','submitted'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 60
+        && request.resource.data.email is string
+        && request.resource.data.email.size() <= 80
+        && request.resource.data.roll is string
+        && request.resource.data.roll.size() <= 30
+        && request.resource.data.submitted == false
+        && request.resource.data.joinedAt == request.time
+        // the quiz must actually be open right now
+        && get(/databases/$(database)/documents/quizzes/$(request.resource.data.quizId)).data.status == 'active';
+
+      allow update, delete: if isAdmin();
+    }
+
+    // ---------------------------------------------------------------
+    // results/{quizId__uid} — the score
+    // Written ONLY by the Cloud Function. No client can create or edit a
+    // result, so no participant can hand themselves marks.
+    // ---------------------------------------------------------------
+    match /results/{rid} {
+      allow get: if ownsId(rid) || isAdmin();
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // ---------------------------------------------------------------
+    // leaderboard/{quizId}/entries/{uid} — public board
+    // Name, score and time only. Emails and roll numbers are never copied
+    // here, so a public read cannot leak them.
+    // ---------------------------------------------------------------
+    match /leaderboard/{quizId} {
+      allow read: if true;
+      allow write: if false;
+
+      match /entries/{uid} {
+        allow read: if true;
+        allow write: if false;
+      }
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

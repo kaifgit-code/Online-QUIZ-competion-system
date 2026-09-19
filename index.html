@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QuizArena — live quiz competitions</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Quiz<span>Arena</span></div>
+  <a href="admin.html">Admin sign in</a>
+</header>
+
+<main class="wrap">
+
+  <div class="card">
+    <h1>Scan the QR code your organiser shows on screen.</h1>
+    <p class="muted">That link opens the quiz directly on your phone. Nothing to install, no account to create.</p>
+  </div>
+
+  <div class="card">
+    <h2>Have a quiz code instead?</h2>
+    <p class="muted">If the organiser gave you a code printed under the QR, type it here.</p>
+    <div class="field">
+      <label for="code">Quiz code</label>
+      <input id="code" placeholder="e.g. 8fK2pQ1mZ" autocomplete="off">
+    </div>
+    <button class="btn-block" id="go">Open quiz</button>
+    <p class="hint" id="err"></p>
+  </div>
+
+  <div class="card">
+    <h2>How a round works</h2>
+    <ol class="muted" style="padding-left:20px;margin:0">
+      <li>Enter your name so the organiser can put you on the board.</li>
+      <li>Answer one question at a time. You can go back and change an answer.</li>
+      <li>The timer runs from the moment you start. At zero your answers are sent automatically.</li>
+      <li>Your score appears right after you submit.</li>
+    </ol>
+  </div>
+
+  <p class="center"><a href="leaderboard.html">View a public leaderboard</a></p>
+
+</main>
+
+<script>
+  const go = document.getElementById("go");
+  const code = document.getElementById("code");
+  const err = document.getElementById("err");
+  function open_() {
+    const v = code.value.trim();
+    if (!v) { err.textContent = "Type the quiz code first."; return; }
+    location.href = "quiz.html?quiz=" + encodeURIComponent(v);
+  }
+  go.addEventListener("click", open_);
+  code.addEventListener("keydown", e => { if (e.key === "Enter") open_(); });
+</script>
+</body>
+</html>

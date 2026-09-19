@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz — QuizArena</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Quiz<span>Arena</span></div>
+  <span class="pill" id="statusPill">Loading</span>
+</header>
+
+<main class="wrap">
+
+  <!-- 1. loading -->
+  <section id="viewLoading" class="card center">
+    <p class="muted" style="margin:0">Loading the quiz…</p>
+  </section>
+
+  <!-- 2. blocked (bad link, closed quiz, error) -->
+  <section id="viewBlocked" class="card hidden">
+    <h1 id="blockTitle">Quiz unavailable</h1>
+    <p id="blockMsg" class="muted"></p>
+    <a class="btn btn-ghost" href="index.html">Back to start</a>
+  </section>
+
+  <!-- 3. join form -->
+  <section id="viewJoin" class="hidden">
+    <div class="card">
+      <h1 id="joinTitle">Quiz</h1>
+      <p id="joinDesc" class="muted"></p>
+      <div class="row">
+        <span class="pill" id="joinQCount"></span>
+        <span class="pill" id="joinDuration"></span>
+        <span class="pill" id="joinMarks"></span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Join this round</h2>
+      <div class="field">
+        <label for="pName">Your name *</label>
+        <input id="pName" maxlength="60" autocomplete="name" placeholder="As it should appear on the board">
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label for="pRoll">Roll number (optional)</label>
+          <input id="pRoll" maxlength="30" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="pEmail">Email (optional)</label>
+          <input id="pEmail" type="email" maxlength="80" autocomplete="email">
+        </div>
+      </div>
+      <p class="hint">The timer starts the second you tap start, so join when you're ready.</p>
+      <button class="btn-block btn-go" id="startBtn">Start quiz</button>
+      <p class="hint" id="joinErr"></p>
+    </div>
+  </section>
+
+  <!-- 4. running quiz -->
+  <section id="viewQuiz" class="hidden">
+    <div class="qmeta">
+      <span class="counter" id="counter">1/1</span>
+      <span class="timer" id="timer">--:--</span>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+
+    <div class="card">
+      <p class="qtext" id="qtext"></p>
+      <div id="opts"></div>
+      <p class="hint" id="marksHint"></p>
+    </div>
+
+    <div class="row">
+      <button class="btn-ghost" id="prevBtn">Previous</button>
+      <button id="nextBtn">Next</button>
+      <button class="btn-go" id="submitBtn" style="margin-left:auto">Submit answers</button>
+    </div>
+    <p class="hint" id="saveState">Answers are saved as you go.</p>
+  </section>
+
+  <!-- 5. submitting -->
+  <section id="viewSending" class="card center hidden">
+    <h2>Sending your answers…</h2>
+    <p class="muted">Don't close this page.</p>
+  </section>
+
+</main>
+
+<script type="module" src="js/quiz.js"></script>
+</body>
+</html>

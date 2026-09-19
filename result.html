@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your result — QuizArena</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Quiz<span>Arena</span></div>
+  <a href="index.html">Home</a>
+</header>
+
+<main class="wrap">
+
+  <section id="loading" class="card center">
+    <p class="muted" style="margin:0">Fetching your result…</p>
+  </section>
+
+  <section id="blocked" class="card hidden">
+    <h1>Result not found</h1>
+    <p class="muted" id="blockMsg"></p>
+    <a class="btn btn-ghost" href="index.html">Back to start</a>
+  </section>
+
+  <section id="done" class="hidden">
+    <div class="score">
+      <small id="who"></small>
+      <p class="num" id="scoreNum">0</p>
+      <small id="outOf"></small>
+    </div>
+
+    <div class="card">
+      <div class="statgrid">
+        <div class="stat"><b id="sCorrect">0</b><span>Correct answers</span></div>
+        <div class="stat"><b id="sWrong">0</b><span>Wrong or skipped</span></div>
+        <div class="stat"><b id="sTime">0:00</b><span>Time taken</span></div>
+        <div class="stat"><b id="sWhen">—</b><span>Submitted at</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 id="quizTitle">Quiz</h2>
+      <p class="muted" id="reviewNote">Your answers are locked in. The organiser reviews all entries before the winner is declared.</p>
+      <a class="btn btn-block" id="lbLink" href="#">See the leaderboard</a>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="js/result.js"></script>
+</body>
+</html>

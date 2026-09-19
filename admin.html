@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin — QuizArena</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">Quiz<span>Arena</span> admin</div>
+  <div class="row">
+    <span class="pill hidden" id="whoPill"></span>
+    <button class="btn-sm btn-ghost hidden" id="signOutBtn" style="color:#fff;border-color:#3d4a70">Sign out</button>
+  </div>
+</header>
+
+<main class="wrap wrap--wide">
+
+  <!-- LOGIN -->
+  <section id="viewLogin" class="hidden" style="max-width:420px;margin:0 auto">
+    <div class="card">
+      <h1>Sign in</h1>
+      <p class="muted">Only accounts listed in the <code>admins</code> collection can manage quizzes.</p>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="pass">Password</label>
+        <input id="pass" type="password" autocomplete="current-password">
+      </div>
+      <button class="btn-block" id="loginBtn">Sign in</button>
+      <p class="hint" id="loginErr"></p>
+    </div>
+  </section>
+
+  <!-- DASHBOARD -->
+  <section id="viewAdmin" class="hidden">
+
+    <div class="tabs">
+      <button data-tab="quizzes" class="on">Quizzes</button>
+      <button data-tab="editor">Quiz editor</button>
+      <button data-tab="people">Participants</button>
+      <button data-tab="results">Results &amp; winner</button>
+    </div>
+
+    <!-- ---- QUIZZES TAB ---- -->
+    <div id="tab-quizzes">
+      <div class="card">
+        <h2>Create a quiz</h2>
+        <div class="field">
+          <label for="nqTitle">Title</label>
+          <input id="nqTitle" placeholder="CSE Dept Tech Quiz — Round 1">
+        </div>
+        <div class="field">
+          <label for="nqDesc">Instructions shown to participants</label>
+          <textarea id="nqDesc" placeholder="20 questions, 15 minutes, one attempt. No negative marking."></textarea>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="nqMin">Duration in minutes</label>
+            <input id="nqMin" type="number" min="1" max="300" value="15">
+          </div>
+          <div class="field">
+            <label for="nqCode">Quiz code (used in the link)</label>
+            <input id="nqCode" placeholder="leave empty for an auto code">
+          </div>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label for="nqStart">Opens at (optional)</label>
+            <input id="nqStart" type="datetime-local">
+          </div>
+          <div class="field">
+            <label for="nqEnd">Closes at (optional)</label>
+            <input id="nqEnd" type="datetime-local">
+          </div>
+        </div>
+        <button id="createQuizBtn">Create quiz</button>
+      </div>
+
+      <div class="card">
+        <h2>All quizzes</h2>
+        <div id="quizList" class="muted">Loading…</div>
+      </div>
+    </div>
+
+    <!-- ---- EDITOR TAB ---- -->
+    <div id="tab-editor" class="hidden">
+      <div class="card" id="noQuizPicked">
+        <p class="muted" style="margin:0">Open a quiz from the Quizzes tab to edit it.</p>
+      </div>
+
+      <div id="editorBody" class="hidden">
+        <div class="card">
+          <div class="spread">
+            <div>
+              <h2 id="edTitle">—</h2>
+              <p class="muted" style="margin:0">Code: <code id="edCode"></code></p>
+            </div>
+            <span class="pill" id="edStatus">draft</span>
+          </div>
+          <hr style="border:none;border-top:1px solid var(--line);margin:16px 0">
+          <div class="grid2">
+            <div class="field">
+              <label for="edTitleIn">Title</label>
+              <input id="edTitleIn">
+            </div>
+            <div class="field">
+              <label for="edMin">Duration in minutes</label>
+              <input id="edMin" type="number" min="1" max="300">
+            </div>
+          </div>
+          <div class="field">
+            <label for="edDesc">Instructions</label>
+            <textarea id="edDesc"></textarea>
+          </div>
+          <div class="grid2">
+            <div class="field">
+              <label for="edStart">Opens at</label>
+              <input id="edStart" type="datetime-local">
+            </div>
+            <div class="field">
+              <label for="edEnd">Closes at</label>
+              <input id="edEnd" type="datetime-local">
+            </div>
+          </div>
+          <div class="row">
+            <button id="saveQuizBtn">Save settings</button>
+            <button class="btn-ghost" id="toggleLiveBtn">Activate</button>
+            <button class="btn-ghost" id="qrBtn">Link &amp; QR code</button>
+          </div>
+        </div>
+
+        <!-- QR panel -->
+        <div class="card hidden" id="qrPanel">
+          <h2>Share this quiz</h2>
+          <div class="field">
+            <label for="shareUrl">Public quiz link</label>
+            <input id="shareUrl" readonly>
+          </div>
+          <div class="row" style="margin-bottom:14px">
+            <button class="btn-sm" id="copyLinkBtn">Copy link</button>
+            <button class="btn-sm btn-ghost" id="downloadQrBtn">Download QR</button>
+          </div>
+          <div id="qrbox"></div>
+          <p class="hint">Project this on screen or print it on the entry pass.</p>
+        </div>
+
+        <!-- question editor -->
+        <div class="card">
+          <div class="spread">
+            <h2 style="margin:0">Questions <span class="muted" id="qCount"></span></h2>
+            <button class="btn-sm" id="addQBtn">Add question</button>
+          </div>
+          <p class="hint">Correct answers are stored in a separate admin-only collection, so participants can never read them.</p>
+          <div id="qList" style="margin-top:14px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- PARTICIPANTS TAB ---- -->
+    <div id="tab-people" class="hidden">
+      <div class="card">
+        <div class="spread">
+          <h2 style="margin:0">Participants</h2>
+          <button class="btn-sm btn-ghost" id="refreshPeople">Refresh</button>
+        </div>
+        <p class="muted" id="peopleState">Open a quiz first.</p>
+        <div class="tablewrap">
+          <table id="peopleTable" class="hidden">
+            <thead><tr>
+              <th>Name</th><th>Roll</th><th>Email</th><th>Joined</th>
+              <th>Submitted</th><th>Score</th><th>Correct</th><th>Time</th><th>Status</th>
+            </tr></thead>
+            <tbody id="peopleBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- RESULTS TAB ---- -->
+    <div id="tab-results" class="hidden">
+      <div class="card">
+        <div class="spread">
+          <h2 style="margin:0">Ranked results</h2>
+          <button class="btn-sm btn-ghost" id="refreshResults">Refresh</button>
+        </div>
+        <p class="muted">Sorted by score, then shortest time taken, then earliest submission.</p>
+        <div class="tablewrap">
+          <table id="resTable" class="hidden">
+            <thead><tr>
+              <th>#</th><th>Name</th><th>Roll</th><th>Score</th><th>Correct</th>
+              <th>Time taken</th><th>Submitted</th><th></th>
+            </tr></thead>
+            <tbody id="resBody"></tbody>
+          </table>
+        </div>
+        <p id="resState" class="muted">Open a quiz first.</p>
+      </div>
+
+      <div class="card">
+        <h2>Declare the winner</h2>
+        <p class="muted">Check the top entries above first. Declaring publishes the name on the public leaderboard.</p>
+        <div class="field">
+          <label for="winnerPick">Winner</label>
+          <select id="winnerPick"><option value="">— choose a participant —</option></select>
+        </div>
+        <div class="row">
+          <button class="btn-go" id="declareBtn">Declare winner</button>
+          <button class="btn-ghost" id="undeclareBtn">Clear declaration</button>
+        </div>
+        <p class="hint" id="winnerNow"></p>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script type="module" src="js/admin.js"></script>
+</body>
+</html>
